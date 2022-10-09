@@ -19,12 +19,11 @@ class _UsersListState extends State<UsersList> {
   final controllerName = TextEditingController();
   final controllerAge = TextEditingController();
   final controllerDate = TextEditingController();
-  // final format = DateFormat("yyyy-MM-dd ");
+  final format = DateFormat("yyyy-MM-dd ");
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
-        title: Text('Users List'),
+        title: Text('Add User'),
       ),
       body: ListView(
         padding: EdgeInsets.all(16),
@@ -74,7 +73,10 @@ class _UsersListState extends State<UsersList> {
       ],
       ),
     );
-   }
+
+Stream<List<User>> readUsers() => FirebaseFirestore.instance.collection('users').snapshots().map((snapshot) => snapshot.docs.map((doc) => User.fromJson(doc.data())).toList());
+
+
    Future createUser(User user) async {
     final docUser = FirebaseFirestore.instance.collection('users').doc();
     user.id = docUser.id;

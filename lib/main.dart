@@ -1,11 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:prototype/screens/verifyemail.dart';
 
+import 'screens/authpage.dart';
 import 'screens/homescreen.dart';
-import 'screens/login.dart';
 import 'screens/settings.dart';
-//import 'package:native_notify/native_notify.dart';
+
+
 
 import 'package:firebase_core/firebase_core.dart';
+
+import 'screens/utils.dart';
+
 //import 'firebase_options.dart';
 
 
@@ -22,6 +28,8 @@ Future main() async {
   await Firebase.initializeApp();
   runApp(MyApp());
 }
+final navigatorKey = GlobalKey<NavigatorState>();
+// final messengerKey = GlobalKey<ScaffoldMessengerState>();
 /*
 This is the firebase initializer for the firebase firestore in the database
 Future main() async {
@@ -31,25 +39,50 @@ Future main() async {
   */
 
 class MyApp extends StatelessWidget {
+final emailController = TextEditingController();
+final passwordController = TextEditingController();
+
+
 
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) =>
+     MaterialApp(
+      scaffoldMessengerKey: Utils.messengerKey,
+      navigatorKey: navigatorKey,
+      // home: HomeScreen(),  
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
 
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (_)=> HomeScreen(),
+        '/': (_)=> StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges() ,
+          builder: (context, snapshot){
+            if(snapshot.connectionState == ConnectionState.waiting){
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError){
+              return Center(child: Text('Something Went Wrong'),);
+            }
+            else if(snapshot.hasData){
+              return VerifyEmailPage();
+            }else{
+              return AuthPage();
+            }
+          },
+        
+        ),
         '/settings': (_)=> SettingScreen(),
-        '/login': (_)=> Login(),
+        '/login': (_)=> AuthPage(),
 
       },
     );
   }
-}
+
 
